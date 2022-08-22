@@ -35,7 +35,7 @@ class TGBot:
     def __init__(self) -> None:
         self.cmd_list = {
             'rd', 'add_pc', 'rm_pc', 'set', 'ra', 'kp',
-            'bind_pc', 'show_pc', 'reset',
+            'bind', 'unbind', 'show_pc', 'reset',
         }
 
     def call(self, update, cmd):
@@ -63,6 +63,8 @@ class TGBot:
             return f"Already has KP."
 
     def reset(self, update, cmd):
+        if update.effective_user.username != 'vieyos':
+            return "No access!"
         db.reset()
         return "ALL DATA RESETED."
 
@@ -70,8 +72,11 @@ class TGBot:
         pc = db.get('pc')
         res = ''
         if not len(cmd):
-            for k in pc:
-                res += f'{k}: {pc[k]["sex"]}\n'
+            res += f'#{len(list(pc.keys()))} PC\n'
+            i = 1
+            for k, v in pc.items():
+                res += f'{i}. {k}: {v["sex"]}, {v["age"]}\n'
+                i += 1
         else:
             now = pc[cmd[0]]
             res = cmd[0] + '\n'
@@ -103,7 +108,6 @@ class TGBot:
                 'sex': r['name']['sex'],
                 'san': r['san']['have'],
             }
-            print(r)
             p = r['touniang'].strip('.st').strip()
             a = re.findall(r'[0-9]+', p)
             b = re.split(r'[0-9]+', p)
@@ -117,13 +121,27 @@ class TGBot:
         else:
             return "Unkown"
 
-    def bind_pc(self, update, cmd):
+    def unbind(self, update, cmd):
+        uid = update.effective_user.id
+        binds = db.get('bind')
+        _del = None
+        for _name, _uid in binds.items():
+            if _uid == uid:
+                _del = _name
+                break
+        if _del is not None:
+            del binds[_del]
+        db.set('bind', binds)
+        return "Unbind successfully."
+
+    def bind(self, update, cmd):
+        self.unbind(update, cmd)
+        uid = update.effective_user.id
         binds = db.get('bind')
         pcs = db.get('pc')
         pc_name = cmd[0]
         if pc_name not in pcs:
             return "Fail to find PC."
-        uid = update.effective_user.id
         if pc_name not in binds:
             binds[pc_name] = uid
             db.set('bind', binds)
