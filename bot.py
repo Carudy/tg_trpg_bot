@@ -1,45 +1,76 @@
 import random
+from turtle import end_fill
 import db
 import requests
 import json
 import re
+import yaml
 
-trans_list = {
-    'str': '力量',
-    'con': '体质',
-    'siz': '体型',
-    'dex': '敏捷',
-    'app': '外貌',
-    'int': '智力',
-    'pow': '意志',
-    'edu': '教育',
-    'luck': '幸运',
-    # 'san': '理智',
-    'shan': '闪避',
-    'fight': '斗殴',
-    'hide': '潜行',
-    'cure': '急救',
-    'coc': '神秘学',
-    'hunman': '人类学',
-    'see': '侦查',
-    'hear': '聆听',
-    'say': '话术',
-    'fear': '恐吓',
-    'love': '魅惑',
-    'mind': '心理学',
-    'lib': '图书馆',
-}
+trans_list = eval(open('attr_trans.txt', encoding='utf-8').read())
+
+
+def trans_attr(attr):
+    if attr in trans_list:
+        return trans_list[attr]
+    return attr
+
+
+def get_bind(update):
+    uid = update.effective_user.id
+    binds = db.get('bind')
+    for pc_name, _uid in binds.items():
+        if uid == _uid:
+            return pc_name
+    return None
 
 
 class TGBot:
     def __init__(self) -> None:
         self.cmd_list = {
-            'rd', 'add_pc', 'rm_pc', 'set', 'ra', 'kp',
-            'bind', 'unbind', 'show_pc', 'reset',
+            'kp', 'reset',
+            'rd', 'ra', 'sc',
+            'add_pc', 'rm_pc', 'show_pc', 'set',
+            'bind', 'unbind',
+            'load_mod', 'tell', 'intro', 'battle',
         }
 
     def call(self, update, cmd):
         return getattr(self, f'{cmd[0]}')(update, cmd[1:])
+
+    def load_mod(self, update, cmd):
+        if update.effective_user.id != db.get('kp'):
+            return "You are not KP!"
+        fp = f'mod_{cmd[0].strip()}.yml'
+        cont = yaml.safe_load(open(fp, encoding='utf-8').read())
+        db.set('mod', cont)
+        return "Mod loaded!"
+
+    def tell(self, update, cmd):
+        if update.effective_user.id != db.get('kp'):
+            return "You are not KP!"
+        mod = db.get('mod')
+        return f'KP: {mod["story"][cmd[0]]}'
+
+    def intro(self, update, cmd):
+        if update.effective_user.id != db.get('kp'):
+            return "You are not KP!"
+        mod = db.get('mod')
+        return f'KP: {mod["npc"][cmd[0]]}'
+
+    def battle(self, update, cmd):
+        if update.effective_user.id != db.get('kp'):
+            return "You are not KP!"
+        pcs = db.get('pc')
+        eners = db.get('mod')['enermy']
+        a = []
+        for i in cmd:
+            if i in pcs:
+                a.append((i, pcs[i]['敏捷']))
+            else:
+                a.append((i, eners[i]['dex']))
+        a.sort(key=lambda x: -x[1])
+        a = ', '.join([i[0] for i in a])
+        return f"Battle start, order: {a}"
 
     def rd(self, update, cmd):
         res = f'{update.effective_user.username} diced '
@@ -95,25 +126,39 @@ class TGBot:
         else:
             return "Fail to find PC."
 
+    def set(self, update, cmd):
+        pcs = db.get('pc')
+        pc = cmd[0]
+        if pc not in pcs:
+            return "Fail to find PC."
+        attr = trans_attr(cmd[1])
+        v = cmd[2]
+        if v.startswith(('+', '-')):
+            pcs[pc][attr] += eval(v)
+        else:
+            pcs[pc][attr] = int(v)
+        db.set('pc', pcs)
+        return "Attribute updated."
+
     def add_pc(self, update, cmd):
         if cmd[0] == 'maoye':
             url = 'https://maoyetrpg.com/api/rolecard/share?&name=rolecard'
             r = requests.post(url, data=json.dumps({'chartid': cmd[1]}))
             r = json.loads(r.content)['data'][0]
             res = {
-                'hp': r['hp']['total'],
-                'mp': r['mp']['total'],
+                'hp': int(r['hp']['total']),
+                'mp': int(r['mp']['total']),
                 'name': r['name']['chartname'],
-                'age': r['name']['ages'],
+                'age': int(r['name']['ages']),
                 'sex': r['name']['sex'],
-                'san': r['san']['have'],
+                'san': int(r['san']['have']),
             }
             p = r['touniang'].strip('.st').strip()
             a = re.findall(r'[0-9]+', p)
             b = re.split(r'[0-9]+', p)
             b = [i if '/' not in i else i.split('/')[0] for i in b]
             for k, v in zip(b, a):
-                res[k] = v
+                res[k] = int(v)
             pc = db.get('pc')
             pc[res['name']] = res
             db.set('pc', pc)
@@ -152,6 +197,29 @@ class TGBot:
             else:
                 return "Already bind to other pl!"
 
+    def sc(self, update, cmd):
+        pc = get_bind(update)
+        if pc is None:
+            return "Fail to find your PC."
+        pcs = db.get('pc')
+        n = random.randint(1, 100)
+        b = pcs[pc]['san']
+        if n <= b:
+            return f'{pc} san check {n} / {b}, 成功！'
+        v = cmd[0]
+        res = 0
+        if '+' in v:
+            v = v.split('+')
+            res = int(v[0])
+            v = v[1]
+        x, y = v.split('d')
+        z = [random.randint(1, int(y)) for _ in range(int(x))]
+        res += sum(z)
+        ret = f'{pc} san check {n} / {b}, 失败！掉san：{res}'
+        pcs[pc]['san'] -= res
+        db.set('pc', pcs)
+        return ret
+
     def ra(self, update, cmd):
         binds = db.get('bind')
         pcs = db.get('pc')
@@ -164,7 +232,7 @@ class TGBot:
         if pc is None:
             return "Fail to find your PC."
         n = random.randint(1, 100)
-        attr = trans_list[cmd[0]] if cmd[0] in trans_list else cmd[0]
+        attr = trans_attr(cmd[0])
         b = int(pc[attr])
         if n < 3:
             r = '竟然是大成功耶！'
