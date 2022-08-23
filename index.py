@@ -1,6 +1,6 @@
 import logging
 from telegram import Update
-from telegram.ext import filters, ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler
+from telegram.ext import filters, ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, PrefixHandler
 
 from bot import *
 
@@ -8,6 +8,8 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
+
+logger = logging.getLogger(__name__)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -41,7 +43,8 @@ if __name__ == '__main__':
     tbot = TGBot()
 
     start_handler = CommandHandler('start', start)
-    echo_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), echo)
+    # echo_handler = MessageHandler(filters.TEXT, echo)
+    echo_handler = PrefixHandler('.', tbot.cmd_list, echo)
     application.add_handler(start_handler)
     application.add_handler(echo_handler)
 
