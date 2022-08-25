@@ -1,6 +1,5 @@
 import logging
-from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, PrefixHandler
+from telegram.ext import Updater, PrefixHandler
 import os
 
 from trpg import *
@@ -11,6 +10,17 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+PORT = int(os.environ.get('PORT', 5000))
+try:
+    TOKEN = open('token', encoding='utf-8').read()
+except:
+    TOKEN = os.environ.get('TG_BOT_TOKEN')
+tbot = TGBot()
+
+
+def error(update, context):
+    """Log Errors caused by Updates."""
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -34,17 +44,12 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 if __name__ == '__main__':
-    try:
-        app_token = open('token', encoding='utf-8').read()
-    except:
-        app_token = os.environ.get('TG_BOT_TOKEN')
-    
-    application = ApplicationBuilder().token(app_token).build()
-
-    global tbot
-    tbot = TGBot()
-
-    echo_handler = PrefixHandler('.', tbot.cmd_list, echo)
-    application.add_handler(echo_handler)
-
-    application.run_polling()
+    app = Updater(TOKEN, use_context=True)
+    dp = app.dispatcher
+    dp.add_handler(PrefixHandler('.', tbot.cmd_list, echo))
+    dp.add_error_handler(error)
+    app.start_webhook(listen="0.0.0.0",
+                      port=int(PORT),
+                      url_path=TOKEN)
+    app.bot.setWebhook('https://dycoc-tg-bot.herokuapp.com/' + TOKEN)
+    app.idle()
