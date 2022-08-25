@@ -1,12 +1,11 @@
 import random
-from turtle import end_fill
-import db
 import requests
 import json
 import re
 import yaml
 
-trans_list = eval(open('attr_trans.txt', encoding='utf-8').read())
+import trpg.db as db
+from trpg.const import attr_trans as trans_list
 
 
 def trans_attr(attr):
