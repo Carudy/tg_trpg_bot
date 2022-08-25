@@ -1,6 +1,9 @@
 # Telegram bot for TRPG COC
 Still in Demo status.
 
+## Run
+`python index.py`
+
 ## API
 Commands start with '.'
 - kp: Become KP
@@ -17,7 +20,7 @@ Commands start with '.'
 - ra *attr*: Check your *attr*
 - sc *x*: San check, fail will minus *x* (can be "z+xdy" format)
 
-#### only for kp`
+#### only for kp
 - load_mod *xx*: Load mod from file *mod_{xx}.yml*
 - tell *xx*: Tell a piece of story labeled *xx* in mod['story']
 - intro *xx*: Introduce sth/sb labeled *xx* in mod['npc']

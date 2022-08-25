@@ -30,7 +30,7 @@ class TGBot:
             'kp', 'reset',
             'rd', 'ra', 'sc',
             'add_pc', 'rm_pc', 'show_pc', 'set',
-            'bind', 'unbind',
+            'bind', 'unbind', 'show_bind',
             'load_mod', 'tell', 'intro', 'battle',
         }
 
