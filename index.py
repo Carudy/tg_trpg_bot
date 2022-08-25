@@ -1,6 +1,7 @@
 import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, PrefixHandler
+import os
 
 from trpg import *
 
@@ -17,6 +18,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = update.message.text
         if not msg.startswith('.'):
             return
+        logger.info(f'Recevie msg: {msg}')
         cmd = msg.split(' ')
         cmd = [i for i in cmd if len(i) > 0]
         cmd[0] = cmd[0][1:]
@@ -32,7 +34,11 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 if __name__ == '__main__':
-    app_token = open('token', encoding='utf-8').read()
+    try:
+        app_token = open('token', encoding='utf-8').read()
+    except:
+        app_token = os.environ.get('TG_BOT_TOKEN')
+    
     application = ApplicationBuilder().token(app_token).build()
 
     global tbot
