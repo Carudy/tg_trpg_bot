@@ -45,8 +45,6 @@ if __name__ == '__main__':
     app.add_handler(PrefixHandler('.', tbot.cmd_list, echo))
 
     app.run_webhook(listen="0.0.0.0",
-                      port=int(PORT),
-                      url_path=TOKEN)
-    app.bot.setWebhook('https://dycoc-tg-bot.herokuapp.com/' + TOKEN)
-
-    
+                    port=int(PORT),
+                    url_path=TOKEN,
+                    webhook_url='https://dycoc-tg-bot.herokuapp.com/' + TOKEN)
