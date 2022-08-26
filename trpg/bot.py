@@ -59,11 +59,14 @@ class TGBot:
             'add_pc', 'rm_pc', 'show_pc', 'set',
             'bind', 'unbind', 'show_bind',
             'load_mod', 'tell', 'intro', 'battle',
-            'show_skill',
+            'show_skill', 'meta',
         }
 
     def call(self, update, cmd):
         return getattr(self, f'{cmd[0]}')(update, cmd[1:])
+
+    def meta(self, update, cmd):
+        return f'Meta: {db.get("meta")}'
 
     def load_mod(self, update, cmd):
         if update.effective_user.id != db.get('kp'):
