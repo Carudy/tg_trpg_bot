@@ -206,9 +206,11 @@ class TGBot:
             db.set('pc', pc)
             return f"PC {res['name']} is uploaded from maoye."
         elif cmd[0] == 'str':
-            name, p = cmd[0].split(':')
+            print(f'Get str pc req: {cmd[1]}')
+            name, p = cmd[1].split(':')
             p = p.split(';')
             pc = db.get('pc')
+            pc[name] = {}
             for q in p:
                 k, v = q.split(',')
                 try:
