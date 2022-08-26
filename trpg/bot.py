@@ -40,7 +40,7 @@ def calc_dice(s):
     else:
         if 'd' in s:
             a, b = s.split('d')
-            r = [random.randint(1, int(b)) for _ in range(a)]
+            r = [random.randint(1, int(b)) for _ in range(int(a))]
             r = sum(r)
         else:
             r = int(s)

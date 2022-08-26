@@ -13,6 +13,7 @@ Commands start with '.'
 - reset: **Reset all thing.** (now only dy can)
 - rd *x*: Roll [1, *x*]
 - add_pc *f* *x*, case *f*:
+  - *Note that each pc should at least has "sex", "san" and "age", etc.*
   - 'maoye': *x* is the pc id in maoye
   - 'str': *x* is formatted as "{name}:{attr1},{value1};{attr2},{value2};..."
 - rm_pc *x*: Remove PC named *x*
