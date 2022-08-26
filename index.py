@@ -26,7 +26,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         logger.info(f'Recevie msg: {msg}')
         cmd = msg.split(' ')
-        cmd = [i for i in cmd if len(i) > 0]
+        cmd = [i.strip() for i in cmd if len(i) > 0]
         cmd[0] = cmd[0][1:]
     except Exception as e:
         logger.warning(f'Get error: {e}')

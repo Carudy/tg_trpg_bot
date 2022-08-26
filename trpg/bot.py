@@ -5,12 +5,12 @@ import re
 import yaml
 
 import trpg.db as db
-from trpg.const import attr_trans as trans_list
+from trpg.const import *
 
 
 def trans_attr(attr):
-    if attr in trans_list:
-        return trans_list[attr]
+    if attr in attr_trans:
+        return attr_trans[attr]
     return attr
 
 
@@ -23,6 +23,34 @@ def get_bind(update):
     return None
 
 
+def get_name(update):
+    res = get_bind(update)
+    if res is None:
+        return update.effective_user.username
+    return res
+
+
+def calc_dice(s):
+    if '+' in s:
+        s = s.split('+')
+        return calc_dice(s[0]) + calc_dice(s[1])
+    elif '-' in s:
+        s = calc_dice(s[0]) - calc_dice(s[1])
+    else:
+        if 'd' in s:
+            a, b = s.split('d')
+            r = [random.randint(1, int(b)) for _ in range(a)]
+            r = sum(r)
+        else:
+            r = int(r)
+        return r
+
+
+def dice_branh(s):
+    x, y = s.split('/')
+    return calc_dice(x), calc_dice(y)
+
+
 class TGBot:
     def __init__(self) -> None:
         self.cmd_list = {
@@ -31,6 +59,7 @@ class TGBot:
             'add_pc', 'rm_pc', 'show_pc', 'set',
             'bind', 'unbind', 'show_bind',
             'load_mod', 'tell', 'intro', 'battle',
+            'show_skill',
         }
 
     def call(self, update, cmd):
@@ -71,8 +100,15 @@ class TGBot:
         a = ', '.join([i[0] for i in a])
         return f"Battle start, order: {a}"
 
+    def show_skill(self, update, cmd):
+        sk = cmd[0]
+        if sk in skill_dict:
+            return skill_dict[sk]
+        else:
+            return "Unkown skill."
+
     def rd(self, update, cmd):
-        res = f'{update.effective_user.username} diced '
+        res = f'{get_name(update)} diced '
         for r in cmd:
             r = int(r)
             if r <= 1:
@@ -102,7 +138,7 @@ class TGBot:
         pc = db.get('pc')
         res = ''
         if not len(cmd):
-            res += f'#{len(list(pc.keys()))} PC\n'
+            res += f'There are {len(list(pc.keys()))} PC\n'
             i = 1
             for k, v in pc.items():
                 res += f'{i}. {k}: {v["sex"]}, {v["age"]}\n'
@@ -111,7 +147,7 @@ class TGBot:
             now = pc[cmd[0]]
             res = cmd[0] + '\n'
             for k, v in now.items():
-                res += f'{k}: {v}\t'
+                res += f'{k}: {v}\n'
         if not res:
             return "Fail to find PC."
         return res
@@ -196,6 +232,14 @@ class TGBot:
             else:
                 return "Already bind to other pl!"
 
+    def show_bind(self, update, cmd):
+        uid = update.effective_user.id
+        binds = db.get('bind')
+        for _name, _uid in binds.items():
+            if _uid == uid:
+                return f'You are bind to {_name}'
+        return f'Not find your bind.'
+
     def sc(self, update, cmd):
         pc = get_bind(update)
         if pc is None:
@@ -203,19 +247,13 @@ class TGBot:
         pcs = db.get('pc')
         n = random.randint(1, 100)
         b = pcs[pc]['san']
+        sa, sb = dice_branh(cmd[0])
         if n <= b:
-            return f'{pc} san check {n} / {b}, 成功！'
-        v = cmd[0]
-        res = 0
-        if '+' in v:
-            v = v.split('+')
-            res = int(v[0])
-            v = v[1]
-        x, y = v.split('d')
-        z = [random.randint(1, int(y)) for _ in range(int(x))]
-        res += sum(z)
-        ret = f'{pc} san check {n} / {b}, 失败！掉san：{res}'
-        pcs[pc]['san'] -= res
+            ret = f'{pc} san check {n} / {b}, 成功！掉san：{sa}'
+            pcs[pc]['san'] -= sa
+        else:
+            ret = f'{pc} san check {n} / {b}, 失败！掉san：{sb}'
+            pcs[pc]['san'] -= sb
         db.set('pc', pcs)
         return ret
 
