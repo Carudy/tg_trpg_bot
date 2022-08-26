@@ -154,7 +154,7 @@ class TGBot:
         else:
             now = pcs[cmd[0]]
             res = cmd[0] + '\n'
-            for k, v in now.items():
+            for k, v in now.attr.items():
                 res += f'{k}: {v}\n'
         if not res:
             return "Fail to find PC."
