@@ -6,6 +6,7 @@ import yaml
 
 import trpg.db as db
 from trpg.const import *
+from trpg.pc import PC
 
 
 def trans_attr(attr):
@@ -202,7 +203,7 @@ class TGBot:
             for k, v in zip(b, a):
                 res[k] = int(v)
             pc = db.get('pc')
-            pc[res['name']] = res
+            pc[res['name']] = PC(res)
             db.set('pc', pc)
             return f"PC {res['name']} is uploaded from maoye."
         elif cmd[0] == 'str':
@@ -210,14 +211,14 @@ class TGBot:
             name, p = cmd[1].split(':')
             p = p.split(';')
             pc = db.get('pc')
-            pc[name] = {}
+            res = {}
             for q in p:
                 k, v = q.split(',')
                 try:
-                    pc[name][k] = int(v)
+                    res[k] = int(v)
                 except:
-                    pc[name][k] = str(v)
-            db.set('pc', pc)
+                    res[k] = str(v)
+            db.set('pc', PC(res))
             return f"PC {name} is uploaded from string."
         else:
             return "Unkown"

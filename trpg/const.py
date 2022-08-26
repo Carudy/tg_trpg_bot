@@ -1,27 +1,37 @@
 attr_trans = {
-    'str': '力量',
-    'con': '体质',
-    'siz': '体型',
-    'dex': '敏捷',
-    'app': '外貌',
-    'int': '智力',
-    'pow': '意志',
-    'edu': '教育',
-    'luck': '幸运',
-    'shan': '闪避',
-    'fight': '斗殴',
-    'hide': '潜行',
-    'cure': '急救',
-    'coc': '神秘学',
-    'hunman': '人类学',
-    'see': '侦查',
-    'hear': '聆听',
-    'say': '话术',
-    'fear': '恐吓',
-    'love': '魅惑',
-    'mind': '心理学',
-    'lib': '图书馆',
+    ['str', '力量', ],
+    ['con', '体质', ],
+    ['siz', '体型', ],
+    ['age', '年龄', ],
+    ['sex', '性别', ],
+    ['dex', '敏捷', ],
+    ['app', '外貌', ],
+    ['int', '智力', '灵感'],
+    ['pow', '意志', ],
+    ['edu', '教育', ],
+    ['luck', '幸运', ],
+    ['shan', '闪避', ],
+    ['fight', '斗殴', ],
+    ['hide', '潜行', ],
+    ['cure', '急救', ],
+    ['coc', '神秘学', ],
+    ['hunman', '人类学', ],
+    ['see', '侦查', ],
+    ['hear', '聆听', ],
+    ['say', '话术', ],
+    ['fear', '恐吓', ],
+    ['love', '魅惑', '取悦'],
+    ['mind', '心理学', ],
+    ['lib', '图书馆', ],
 }
+
+attr_set = set()
+attr_trans_id = {}
+for i, a in enumerate(attr_trans):
+    attr_set |= set(a)
+    for k in a:
+        attr_trans_id[k] = i
+
 
 skill_dict = {
     "信用评级":

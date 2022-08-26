@@ -1,5 +1,7 @@
 import datetime
 
+from trpg.const import *
+
 db = dict()
 db['meta'] = {
     'start_time': datetime.datetime.now()
@@ -9,6 +11,9 @@ db['meta'] = {
 def reset():
     global db
     db = dict()
+    db['meta'] = {
+        'start_time': datetime.datetime.now()
+    }
 
 
 def set(k, v):
