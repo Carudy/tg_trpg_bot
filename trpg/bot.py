@@ -202,15 +202,15 @@ class TGBot:
             b = [i if '/' not in i else i.split('/')[0] for i in b]
             for k, v in zip(b, a):
                 res[k] = int(v)
-            pc = db.get('pc')
-            pc[res['name']] = PC(res)
-            db.set('pc', pc)
+            pcs = db.get('pc')
+            pcs[res['name']] = PC(res)
+            db.set('pc', pcs)
             return f"PC {res['name']} is uploaded from maoye."
         elif cmd[0] == 'str':
             print(f'Get str pc req: {cmd[1]}')
             name, p = cmd[1].split(':')
             p = p.split(';')
-            pc = db.get('pc')
+            pcs = db.get('pc')
             res = {}
             for q in p:
                 k, v = q.split(',')
@@ -218,7 +218,8 @@ class TGBot:
                     res[k] = int(v)
                 except:
                     res[k] = str(v)
-            db.set('pc', PC(res))
+            pcs[name] = PC(res)
+            db.set('pc', pcs)
             return f"PC {name} is uploaded from string."
         else:
             return "Unkown"
