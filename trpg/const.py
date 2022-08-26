@@ -1,4 +1,4 @@
-attr_trans = {
+attr_trans = [
     ['str', '力量', ],
     ['con', '体质', ],
     ['siz', '体型', ],
@@ -23,7 +23,7 @@ attr_trans = {
     ['love', '魅惑', '取悦'],
     ['mind', '心理学', ],
     ['lib', '图书馆', ],
-}
+]
 
 attr_set = set()
 attr_trans_id = {}
