@@ -143,16 +143,16 @@ class TGBot:
         return "ALL DATA RESETED."
 
     def show_pc(self, update, cmd):
-        pc = db.get('pc')
+        pcs = db.get('pc')
         res = ''
         if not len(cmd):
-            res += f'There are {len(list(pc.keys()))} PC\n'
+            res += f'There are {len(list(pcs.keys()))} PC\n'
             i = 1
-            for k, v in pc.items():
+            for k, v in pcs.items():
                 res += f'{i}. {k}: {v["sex"]}, {v["age"]}\n'
                 i += 1
         else:
-            now = pc[cmd[0]]
+            now = pcs[cmd[0]]
             res = cmd[0] + '\n'
             for k, v in now.items():
                 res += f'{k}: {v}\n'
@@ -207,10 +207,9 @@ class TGBot:
             db.set('pc', pcs)
             return f"PC {res['name']} is uploaded from maoye."
         elif cmd[0] == 'str':
-            print(f'Get str pc req: {cmd[1]}')
+            pcs = db.get('pc')
             name, p = cmd[1].split(':')
             p = p.split(';')
-            pcs = db.get('pc')
             res = {}
             for q in p:
                 k, v = q.split(',')
