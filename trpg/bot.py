@@ -42,7 +42,7 @@ def calc_dice(s):
             r = [random.randint(1, int(b)) for _ in range(a)]
             r = sum(r)
         else:
-            r = int(r)
+            r = int(s)
         return r
 
 
@@ -101,11 +101,15 @@ class TGBot:
         return f"Battle start, order: {a}"
 
     def show_skill(self, update, cmd):
-        sk = cmd[0]
-        if sk in skill_dict:
-            return skill_dict[sk]
+        if len(cmd):
+            sk = cmd[0]
+            if sk in skill_dict:
+                return skill_dict[sk]
+            else:
+                return "Unkown skill."
         else:
-            return "Unkown skill."
+            res = ', '.join(list(skill_dict.keys()))
+            return 'Skills: ' + res
 
     def rd(self, update, cmd):
         res = f'{get_name(update)} diced '
@@ -198,6 +202,18 @@ class TGBot:
             pc[res['name']] = res
             db.set('pc', pc)
             return f"PC {res['name']} is uploaded from maoye."
+        elif cmd[0] == 'str':
+            name, p = cmd[0].split(':')
+            p = p.split(';')
+            pc = db.get('pc')
+            for q in p:
+                k, v = q.split(',')
+                try:
+                    pc[name][k] = int(v)
+                except:
+                    pc[name][k] = str(v)
+            db.set('pc', pc)
+            return f"PC {name} is uploaded from string."
         else:
             return "Unkown"
 

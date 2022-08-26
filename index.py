@@ -20,7 +20,7 @@ tbot = TGBot()
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
+    try:    
         msg = update.message.text
         if not msg.startswith('.'):
             return

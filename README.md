@@ -12,8 +12,9 @@ Commands start with '.'
 - kp rm: Remove current KP
 - reset: **Reset all thing.** (now only dy can)
 - rd *x*: Roll [1, *x*]
-- add_pc *f* *x*:
-  - now *f* can only be 'maoye', and *x* is the pc id in maoye
+- add_pc *f* *x*, case *f*:
+  - 'maoye': *x* is the pc id in maoye
+  - 'str': *x* is formatted as "{name}:{attr1},{value1};{attr2},{value2};..."
 - rm_pc *x*: Remove PC named *x*
 - show_pc *x*: Show PC named *x* in detail. If *x* is not given, show pc list
 - set *pc* *attr* *x*: Change pc[attr] to/by *x*, *x* can start with '+' or '-' if it is "by" else "to".

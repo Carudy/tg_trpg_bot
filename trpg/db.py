@@ -1,4 +1,9 @@
+import datetime
+
 db = dict()
+db['meta'] = {
+    'start_time': datetime.datetime()
+}
 
 
 def reset():
